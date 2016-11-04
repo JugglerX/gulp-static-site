@@ -1,2 +1,10 @@
-# gulp-static-site
-A Gulp static site generator with multiple data sources: frontmatter, json, yml
+# Gulp Static Site Gen
+
+## Building
+
+```
+npm install
+```
+```
+gulp build
+```

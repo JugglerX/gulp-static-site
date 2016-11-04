@@ -1,0 +1,40 @@
+@import 'grid/grid';
+
+
+// //////////////////////
+// CONFIG
+// //////////////////////
+
+$total_width: 960px;
+$container_margin: auto;
+$gutter_width: 20px;
+
+$color_yellow: #fff200;
+$color_nearlyblack: #252525;
+$color_nearlynearlyblack: #454545;
+$color_body: #636363;
+$color_headlines: #b7b7b7;
+
+$max_width: 960px;
+
+@include generate_helper_classes();
+
+#row1{
+	div{@include column(1);}
+	@include generate_grid_positions(div, 1);
+}
+
+#row2{
+	div{@include column(2);}
+	@include generate_grid_positions(div, 2);
+}
+
+#row3{
+	div{@include column(3);}
+	@include generate_grid_positions(div, 3);
+}
+
+#row4{
+	div{@include column(4);}
+	@include generate_grid_positions(div, 4);
+}

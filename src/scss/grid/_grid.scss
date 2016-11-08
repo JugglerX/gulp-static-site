@@ -1,234 +1,163 @@
-/**
- * Profound Grid
- * 
- * Built in Sass (SCSS) this responsive/adaptive grid supports both fixed and fluid layouts, 
- * relative and fixed gutters, as well as your choice of semantic markup or generic '.grid-x' classes.
- * 
- * The biggest difference to other grid systems is the use of negative margins for column
- * placements, avoiding the subpixel rounding issues that usually break/uglify fluid layouts
- * in some browsers.
- * 
- * Nested columns are supported too, without having to reset the grid on each level. 
- *
- * Credits/Inspiration:
- * -------------------
- * Semantic Grid: http://www.semantic.gs
- * Susy: http://susy.oddbird.net
- * Negative Grid: http://chrisplaneta.com/freebies/negativegrid-fluid-css-grid-by-chris-planeta/
- *
- * @author Profound Creative Studio
- * @url http://www.profoundgrid.com
- * @url http://www.weareprofound.com 
- */
+// ==========================================================================
+// Grid
+// ==========================================================================
 
- ////////////////////////////////////////////////////////////////////////////////
-// Defaults (feel free to override)
-////////////////////////////////////////////////////////////////////////////////
+$include-html-grid-classes: true;
+$row-width: 1200px;
+$total-columns: 12;
+$column-gutter: 20px;
 
-$total_columns: 	12;			// 				//
-$total_width:		960px; 		// px|100% 		// px = fixed, 100% = fluid
-$gutter_width:		1%;			// px|%			// px = fixed, % = fluid
-$container_margin:	1%;			// auto|px|%	//
-
-$class_container:	'row';		//				//
-$class_column:		'col';		//				//
-$class_push:		'push';		//				//
-
-
-////////////////////////////////////////////////////////////////////////////////
-// GRID MATH
-////////////////////////////////////////////////////////////////////////////////
-
-@function element_width($column_index){
-	@if ($total_width == 100%){
-	  	$not_rounded_value: (((100% + $gutter_width)/$total_columns)*$column_index)-$gutter_width;
-	    $not_rounded_value: $not_rounded_value * 100;
-	    $rounded_value: round($not_rounded_value)/100;
-	    @return $rounded_value;
-	}@else{
-		@return ((($total_width + $gutter_width)/$total_columns)*$column_index)-$gutter_width;
-	}
+//
+// Helpers
+// ==========================================================================
+@function grid-calc($colNumber, $totalColumns) {
+  @return percentage(($colNumber / $totalColumns));
 }
 
-@function column_width(){
-	@if ($total_width == 100%){
-	  	$not_rounded_value: (((100% + $gutter_width)/$total_columns))-$gutter_width;
-	    $not_rounded_value: $not_rounded_value * 100;
-	    $rounded_value: round($not_rounded_value)/100;
-	    @return $rounded_value * 1%;
-	}@else{
-		@return ($total_width - ($gutter_width*($total_columns - 1)))/$total_columns;
-	}
+// We use this to do clear floats
+@mixin clearfix {
+  &:before, &:after { content: " "; display: table; }
+  &:after { clear: both; }
 }
 
-@function container_width(){
-	@if ($total_width == 100%){
-		@if ($container_margin == auto){
-			@return 100%;
+//
+// Row
+// ==========================================================================
+@mixin grid-row($behavior: false) {
+
+  // use @include grid-row(nest); to include a nested row
+  @if $behavior == nest {
+    width: auto;
+    margin-left: ($column-gutter/2);
+    margin-right: ($column-gutter/2);
+    margin-top: 0;
+    margin-bottom: 0;
+    max-width: none;
+  }
+
+  // use @include grid-row(collapse); to collapsed a container row margins
+  @else if $behavior == collapse {
+    width: 100%;
+    margin: 0;
+    max-width: $row-width;
+  } 
+
+  // use @include grid-row(nest-collapse); to collapse outer margins on a nested row
+  @else if $behavior == nest-collapse {
+    width: auto;
+    margin: 0;
+    max-width: none;
+  }
+
+  // use @include grid-row; to use a container row
+  @else {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    max-width: $row-width;
+
+  }
+
+  // Clearfix for all rows
+  @include clearfix();
+}
+
+//
+// Column
+// ==========================================================================
+@mixin grid-column($columns:false, $collapse:false) {
+
+  // If collapsed, get rid of gutter padding
+  @if $collapse {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  // Gutter padding whenever a column isn't set to collapse
+  // (use $collapse:null to do nothing)
+  @else if $collapse == false {
+    padding-left: ($column-gutter / 2);
+    padding-right: ($column-gutter / 2);
+  }
+
+  // If a column number is given, calculate width
+  @if $columns {
+    width: grid-calc($columns, $total-columns);
+  }
+
+}
+
+//
+// Generate Grid HTML Classes
+// ==========================================================================
+@mixin grid-html-classes($size) {
+
+  .column,
+  .columns { 
+    @include grid-column($columns:false); 
+    float: left;
+  }
+
+  @for $i from 1 through $total-columns {
+    .#{$size}-#{$i} { @include grid-column($columns:$i,$collapse:null); }
+  }
+
+	.row {
+		&.#{$size}-collapse {
+			> .column,
+			> .columns { @include grid-column($collapse:true); }
+
+			.row {margin-left:0; margin-right:0;}
 		}
-		@return 100% - 2*$container_margin;
-	} @else {
-		@return $total_width;
-	}
-}
-////////////////////////////////////////////////////////////////////////////////
-// BASIC MIXINS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Clearfix
- */
-@mixin clearfix(){
-	overflow: hidden;
-	*zoom: 1;
-}
-
-/**
- * Legacy Clearfix
- */
-@mixin legacy-pie-clearfix(){
-	*zoom: 1;
-
-	:after {
-	  content: "\0020";
-	  display: block;
-	  height: 0;
-	  clear: both;
-	  overflow: hidden;
-	  visibility: hidden;
+		&.#{$size}-uncollapse {
+			> .column,
+			> .columns {
+				@include grid-column;
+			}
+		}
 	}
 }
 
-/**
- * Establish the grid-containing element.
- */
-@mixin container(){
-	width: container_width(); 
-	margin: 0 $container_margin;
-}
+@if $include-html-grid-classes {
+  // Row
+  .row {
+    @include grid-row;
 
-/**
- * Align an element to the grid.
- */
-@mixin column($_columns_width, $_padding_columns:null){
-	float: left; 
-	margin-right: -100%;
-	$_width_perc: element_width($_columns_width);
-    width: $_width_perc;       
+    &.collapse {
+       > .column,
+       > .columns { @include grid-column($collapse:true); }
 
-    @if($_padding_columns != null){
-    	@include push($_padding_columns);
+      .row {margin-left:0; margin-right:0;}
     }
+
+    .row { @include grid-row($behavior:nest);
+      &.collapse { @include grid-row($behavior:nest-collapse); }
+    }
+  }
+
+  // Column
+  .column,
+  .columns { 
+    @include grid-column($columns:$total-columns); 
+  }
+
+  // Generate Column Classes
+  @media #{$small-up} {
+    @include grid-html-classes("small");
+  }
+
+  @media #{$medium-up} {
+    @include grid-html-classes("medium");
+  }
+
+  @media #{$large-up} {
+    @include grid-html-classes("large");
+  }
+
+  @media #{$extra-large-up} {
+    @include grid-html-classes("extra-large");
+  }
 }
 
-/**
- * Apply to any column to make it the last one of the current row.
- */
-@mixin column_omega(){
-	
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// MARGIN MIXINS
-////////////////////////////////////////////////////////////////////////////////
-
-@mixin pre(){}
-@mixin post(){}
-@mixin squish(){}
-
-@mixin push($_column_index){
-	$_width_perc: 0;
-	@if ($total_width == 100%){
-		$_width_perc: ($gutter_width + element_width($_column_index));
-	}@else{
-		//$_width_perc: (column_width() + $gutter_width)*$_column_index;
-		$_width_perc: ($gutter_width + element_width($_column_index));
-	}
-	
-	margin-left: $_width_perc;       
-}
-
-@mixin pull(){}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// HELPER CLASSES
-////////////////////////////////////////////////////////////////////////////////
-
-@mixin generate_helper_classes(){
-
-	/* Helper Class: Container */
-	.#{$class_container}{
-		@include container();
-	}
-
-	/* Helper Class: Columns */ 
-	@for $i from 1 through $total_columns{
-		.#{$class_column}#{$i} {
-			@include column($i)
-		}
-	}
-
-	/* Helper Class: Horizontal Position */ 
-	@for $i from 0 through ($total_columns - 1){
-		.#{$class_push}#{$i} {
-			@include push($i);
-		}
-	}
-
-}
-
-@mixin generate_grid_positions($_column_selector, $_element_width){
-
-	$_cols_per_row: floor($total_columns / $_element_width);
-
-	// create rule for each element
-	@for $i from 1 through $_cols_per_row{
-
-		#{$_column_selector}:nth-child(#{$_cols_per_row}n+#{$i}){
-			@include push((($i - 1)*$_element_width));
-			margin-bottom: $gutter_width;
-
-			@if ($i == 1) {
-				clear: both;
-				@include clearfix();
-			}@else{
-				clear: none;
-			}
-		}	
-	}
-}
-
-@mixin generate_grid_positions_legacy($_column_selector, $_element_width, $_elements_in_grid:$total_columns){
-
-	$_cols_per_row: floor($total_columns / $_element_width);
-	$_current_col:1;
-
-	// create rule for each element
-	@for $i from 1 through $_elements_in_grid{
-
-		$selector: #{$_column_selector};
-		@for $ii from 2 through $i{
-			$selector: #{$selector}+#{$_column_selector};
-		}
-
-
-		#{$selector}{
-			@include push((($_current_col - 1)*$_element_width));
-			margin-bottom: $gutter_width;
-
-			@if ($_current_col == 1) {
-				clear: both;
-				@include legacy-pie-clearfix();
-			}@else{
-				clear: none;
-			}
-
-			$_current_col: $_current_col + 1;
-			@if ($_current_col > $_cols_per_row){
-				$_current_col:1;
-			}
-		}	
-	}
-}

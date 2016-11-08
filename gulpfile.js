@@ -14,36 +14,32 @@ var uglify = require('gulp-uglify');
 var plumber = require('gulp-plumber');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-var exit = browserSync.exit;
 var faker = require('faker');
 var markdownToJSON = require('gulp-markdown-to-json');
 var marked = require('marked');
 var changedInPlace = require('gulp-changed-in-place');
 var rename = require('gulp-rename');
+var matter = require('gray-matter');
 
 // ----------------------------------------------------------------
 gulp.task('markdown', () => {
   gulp.src('./site/**/*.md')
     .pipe(markdownToJSON(marked))
     .pipe(rename(function (path) {
-      path.extname = "_md.json"
+      path.extname = ".md.json"
     }))
     .pipe(gulp.dest('./site'))
 });
 
 gulp.task('html', function () { 
     return gulp
-       .src('./site/**/*.html')   
+       .src('./site/**/*.html')
+        
+       // Extract YAML front-matter and assign with gulp-data
         .pipe(data(function(file) {
-          console.log(file.path);
-        }))
-
-        .pipe(frontMatter({ 
-          property: 'file.meta', 
-        }))
-
-        .pipe(data(function(file) {
-          console.log(file.data);
+            var m = matter(String(file.contents));
+            file.contents = new Buffer(m.content);
+            return m.data;
         }))
 
         .pipe(data(function(file) {
@@ -60,16 +56,16 @@ gulp.task('html', function () {
           }
         }))
 
-         .pipe(data(function(file) {
-            // console.log(file.data);
-        }))
- 
         .pipe(data(function(file) {
           return { 'foo': 'bar' }
         })) 
 
         .pipe(data(function(file) { 
             file.data.fakeName = faker.name.findName();
+        }))
+
+        .pipe(data(function(file) {
+            console.log(file.data);
         }))
 
         .pipe(hb()
@@ -120,8 +116,8 @@ gulp.task('serve', function() {
   gulp.watch(['./src/scss/**/*.scss'], ['sass']);
   gulp.watch(['./src/js/*.js'], ['js']);
   gulp.watch(['./src/**/*.hbs'], ['html']);
-  gulp.watch(['./site/**/*.html'], ['html']);
-  gulp.watch(['./site/**/*.json'], ['html']);
+  gulp.watch(['./site/**/*.html'], ['html']).on('change', reload);
+  gulp.watch(['./site/**/*.json'], ['html']).on('change', reload);
   gulp.watch(['./src/data/**/*.json'], ['html']);
   gulp.watch(['./web/{scss,css,js}/*.{scss,css,js}']).on('change', reload);
   gulp.watch(['./web/*.html']).on('change', reload);
@@ -144,5 +140,5 @@ gulp.task('default', ['build'], function(cb) {
 
 // ----------------------------------------------------------------
 gulp.task('build', function (done) {
-  runSequence('cleanup', 'html', 'js', 'sass', done);
+  runSequence('cleanup', 'markdown', 'html', 'js', 'sass', done);
 });

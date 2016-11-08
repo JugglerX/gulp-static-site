@@ -3,11 +3,11 @@ title: Front Matter Title
 description: blog page using front matter
 layout: home
 base_url: "./"
----  
+--- 
 
 <!DOCTYPE HTML>
 <html>
-<head>
+<head> 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title></title>
@@ -17,12 +17,10 @@ base_url: "./"
     <link rel="stylesheet" href="css/style.css">
     <script src="js/scripts.js"></script>
 </head>
-
+ 
 <body>
 
 {{> include/header}}
-
-
     <h4>Rendered HTML</h4>
 
     <div class="row display">
@@ -74,6 +72,10 @@ base_url: "./"
 
 <strong>{json site}</strong> 
 <pre><code class="language-json">{{json site}}</code></pre>
+
+<strong>{json @file.data}}</strong>
+<pre><code class="language-json">{{json @file.data}}</code></pre>
+
 <strong>{json @file}}</strong>
 <pre><code class="language-json">{{json @file}}</code></pre>
 
@@ -81,11 +83,11 @@ base_url: "./"
 <pre><code class="language-json">{{json @file.meta}}</code></pre>
 
 
-<strong>{json file.meta}}</strong>
-<pre><code class="language-json">{{json file.meta}}</code></pre>
+<strong>{json file.data}}</strong>
+<pre><code class="language-json">{{json file.data}}</code></pre>
 
-<strong>{json name}}</strong>
-<pre><code class="language-json">{{json name}}</code></pre>
+<strong>{json data}}</strong>
+<pre><code class="language-json">{{json data}}</code></pre>
 
 <strong>{json file.name}}</strong>
 <pre><code class="language-json">{{json file.name}}</code></pre>

@@ -33,10 +33,35 @@ gulp.task('markdown', () => {
 
 gulp.task('html', function () { 
     return gulp
-       .src('./site/**/*.hbs')  
+       .src('./site/**/*.html')   
+        .pipe(data(function(file) {
+          console.log(file.path);
+        }))
 
-        .pipe(frontMatter({
-            property: 'data.frontMatter'
+        .pipe(frontMatter({ 
+          property: 'file.meta', 
+        }))
+
+        .pipe(data(function(file) {
+          console.log(file.data);
+        }))
+
+        .pipe(data(function(file) {
+          var path = file.path.replace('.html', '.json');
+          if (fs.existsSync(path)) {
+            return require(path);  
+          }
+        }))
+
+        .pipe(data(function(file) {
+          var path = file.path.replace('.html', '.md.json');
+          if (fs.existsSync(path)) {
+            return require(path);  
+          }
+        }))
+
+         .pipe(data(function(file) {
+            // console.log(file.data);
         }))
  
         .pipe(data(function(file) {
@@ -46,10 +71,6 @@ gulp.task('html', function () {
         .pipe(data(function(file) { 
             file.data.fakeName = faker.name.findName();
         }))
-
-         .pipe(data(function(file) {
-            console.log(file.meta); 
-        })) 
 
         .pipe(hb()
           .partials('./src/partials/**/*.{hbs,js}')

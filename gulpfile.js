@@ -12,8 +12,7 @@ var sass = require('gulp-sass');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var plumber = require('gulp-plumber');
-var browserSync = require('browser-sync');
-var reload = browserSync.reload;
+var browserSync = require('browser-sync').create();
 var faker = require('faker');
 var markdownToJSON = require('gulp-markdown-to-json');
 var marked = require('marked');
@@ -100,11 +99,11 @@ gulp.task('sass', function () {
   return gulp.src('./src/scss/style.scss')
     .pipe(plumber())
     .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest('./web/css'));
+    .pipe(gulp.dest('./web/css'))
+    .pipe(browserSync.stream());
 });
 
 // ----------------------------------------------------------------
-
 gulp.task('serve', function() {
   browserSync.init({
     server: {
@@ -112,16 +111,21 @@ gulp.task('serve', function() {
       open: 'external'
     }
   });
+
   gulp.watch(['./gulpfile.js'], ['html'])
-  gulp.watch(['./src/scss/**/*.scss'], ['sass']);
+  gulp.watch(['./src/scss/**/*.scss'], ['sass'])
   gulp.watch(['./src/js/*.js'], ['js']);
   gulp.watch(['./src/**/*.hbs'], ['html']);
-  gulp.watch(['./site/**/*.html'], ['html']).on('change', reload);
-  gulp.watch(['./site/**/*.json'], ['html']).on('change', reload);
+  gulp.watch(['./site/**/*.html'], ['html']).on('change', browserSync.reload);
+  gulp.watch(['./site/**/*.json'], ['html']).on('change', browserSync.reload);
   gulp.watch(['./src/data/**/*.json'], ['html']);
-  gulp.watch(['./web/{scss,css,js}/*.{scss,css,js}']).on('change', reload);
-  gulp.watch(['./web/*.html']).on('change', reload);
+  gulp.watch(['./web/{scss,css,js}/*.{scss,css,js}']).on('change', browserSync.reload);
+  gulp.watch(['./web/*.html']).on('change', browserSync.reload);
 });
+
+
+// ----------------------------------------------------- Default
+gulp.task( 'default', [ 'sass','scripts', 'browser-sync' ] );
 
 // ----------------------------------------------------------------
 

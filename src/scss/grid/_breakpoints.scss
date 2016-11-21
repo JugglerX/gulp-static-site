@@ -20,7 +20,7 @@ $extra-large-range: (1441px, 5000px);
 
 @function upper-bound($range) {
   @return nth($range, 2);
-}
+} 
 
 $screen: "only screen";
 $landscape: "(orientation: landscape)";

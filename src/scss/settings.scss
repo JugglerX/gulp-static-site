@@ -1,0 +1,27 @@
+// ==========================================================================
+// Settings
+// ==========================================================================
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700);
+
+$base-font-size: 15px;
+$base-line-height: 24px;
+$base-font-color: #333;
+$custom-font-color: #333;
+
+$base-font: "Open Sans", "helvetica", "arial"; // "Artifakt Element"
+$custom-font: "Open Sans", "helvetica", "arial"; // "Artifakt Legend"
+$font-awesome: "FontAwesome";
+
+$primary-color: #FF3A43;
+$secondary-color: #1B96D4;
+
+$link-color: $primary-color;
+$link-color-hover: lighten($primary-color, 10%);
+
+$white: #FFFFFF;
+$black: #000000; 
+$gray: #666666;
+
+$row-width: rem-calc(1000);
+$total-columns: 12;
+$column-gutter: rem-calc(30);

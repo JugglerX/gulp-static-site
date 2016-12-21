@@ -1,0 +1,90 @@
+// ==========================================================================
+// Breakpoints
+// ==========================================================================
+
+//
+// Breakpoints
+// ==========================================================================
+$small-range: (0px, 767px);
+$medium-range: (768px, 1024px);
+$large-range: (1025px, 1279px);
+$extra-large-range: (1441px, 5000px);
+
+
+//
+// Media Query Variables
+// ==========================================================================
+@function lower-bound($range) {
+  @return nth($range, 1);
+}
+
+@function upper-bound($range) {
+  @return nth($range, 2);
+} 
+
+$screen: "only screen";
+$landscape: "(orientation: landscape)";
+$portrait: "(orientation: portrait)";
+
+$small-up: $screen;
+$small-only: "#{$screen} and (max-width: #{upper-bound($small-range)})";
+
+$medium-up: "#{$screen} and (min-width:#{lower-bound($medium-range)})";
+$medium-only: "#{$screen} and (min-width:#{lower-bound($medium-range)}) and (max-width:#{upper-bound($medium-range)})";
+
+$large-up: "#{$screen} and (min-width:#{lower-bound($large-range)})";
+$large-only: "#{$screen} and (min-width:#{lower-bound($large-range)}) and (max-width:#{upper-bound($large-range)})";
+
+$extra-large-up: "#{$screen} and (min-width:#{lower-bound($extra-large-range)})";
+$extra-large-only: "#{$screen} and (min-width:#{lower-bound($extra-large-range)}) and (max-width:#{upper-bound($extra-large-range)})";
+
+
+//
+// Breakpoint Debugger (displays breakpoint name in bottom right corner of website)
+// ==========================================================================
+@mixin display-breakpoint {
+    &:after  {
+    background: black;
+    color: #FFFFFF;
+    opacity: 0.8;
+    padding: .5em 1em;
+    position: fixed;
+    text-align: center;
+    bottom: 0;
+    right: 0;
+    z-index: 999;
+    @media #{$small-up} {
+      background: orange;
+      content: "small-up";
+    }
+    @media #{$small-only} {
+      background: orange;
+      content: "small - #{$small-range}";
+    }
+    @media #{$medium-up} {
+      background: green;
+      content: "medium-up";
+    }
+    @media #{$medium-only} {
+      background: green;
+      content: "medium - #{$medium-range})";
+    }
+    @media #{$large-up} {
+      background: blue;
+      content: "large-up";
+    }
+    @media #{$large-only} {
+      background: blue;
+      content: "large - #{$large-range}";
+    }
+    @media #{$extra-large-up} {
+      background: blue;
+      content: "extra-large-up";
+    }
+    @media #{$extra-large-only} {
+      background: blue;
+      content: "extra-large - #{$extra-large-range}";
+    }
+  }
+}
+

@@ -1,2 +1,28 @@
-@import 'fixed';
+@import 'settings';
+@import 'grid/breakpoints';
+@import 'grid/grid';
 @import 'prism';
+
+@import 'components/header';
+@import 'components/buttons';
+
+/* Setup */
+body {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  font-family: $base-font;
+  font-size: $base-font-size;
+  color: #333;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// Set box-sizing globally to handle padding and border widths
+*,
+*:before,
+*:after { 
+  box-sizing: border-box;
+}

@@ -11,30 +11,59 @@ var runSequence = require('run-sequence');
 var sass = require('gulp-sass');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-var browserSync = require('browser-sync');
-var reload = browserSync.reload;
-
+var plumber = require('gulp-plumber');
+var browserSync = require('browser-sync').create();
+var faker = require('faker');
+var markdownToJSON = require('gulp-markdown-to-json');
+var marked = require('marked');
+var changedInPlace = require('gulp-changed-in-place');
+var rename = require('gulp-rename');
+var matter = require('gray-matter');
 
 // ----------------------------------------------------------------
+gulp.task('markdown', () => {
+  gulp.src('./site/**/*.md')
+    .pipe(markdownToJSON(marked))
+    .pipe(rename(function (path) {
+      path.extname = ".md.json"
+    }))
+    .pipe(gulp.dest('./site'))
+});
 
-gulp.task('html', function () {
+gulp.task('html', function () { 
     return gulp
        .src('./site/**/*.html')
-
-       .pipe(frontMatter({ 
-          property: 'meta', 
-          remove: true
+        
+       // Extract YAML front-matter and assign with gulp-data
+        .pipe(data(function(file) {
+            var m = matter(String(file.contents));
+            file.contents = new Buffer(m.content);
+            return m.data;
         }))
 
         .pipe(data(function(file) {
-          console.log(file.meta);
+          var path = file.path.replace('.html', '.json');
+          if (fs.existsSync(path)) {
+            return require(path);  
+          }
         }))
 
         .pipe(data(function(file) {
-          return require(file.path.replace('.html', '.json'));
+          var path = file.path.replace('.html', '.md.json');
+          if (fs.existsSync(path)) {
+            return require(path);  
+          }
         }))
 
-         .pipe(data(function(file) {
+        .pipe(data(function(file) {
+          return { 'foo': 'bar' }
+        })) 
+
+        .pipe(data(function(file) { 
+            file.data.fakeName = faker.name.findName();
+        }))
+
+        .pipe(data(function(file) {
             console.log(file.data);
         }))
 
@@ -44,7 +73,7 @@ gulp.task('html', function () {
           .helpers('./src/helpers/**/*.js')
           .data('./src/data/**/*.{js,json}')
           .data({
-            lorem: 'dolor',
+            lorem: faker.name.findName(), // Rowan Nikolaus
             ipsum: 'sit amet'
           })
           .data({
@@ -68,12 +97,13 @@ gulp.task('js', function() {
 
 gulp.task('sass', function () {
   return gulp.src('./src/scss/style.scss')
+    .pipe(plumber())
     .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest('./web/css'));
+    .pipe(gulp.dest('./web/css'))
+    .pipe(browserSync.stream());
 });
 
 // ----------------------------------------------------------------
-
 gulp.task('serve', function() {
   browserSync.init({
     server: {
@@ -81,13 +111,21 @@ gulp.task('serve', function() {
       open: 'external'
     }
   });
-  gulp.watch(['./src/scss/**/*.scss'], ['sass']);
+
+  gulp.watch(['./gulpfile.js'], ['html'])
+  gulp.watch(['./src/scss/**/*.scss'], ['sass'])
   gulp.watch(['./src/js/*.js'], ['js']);
   gulp.watch(['./src/**/*.hbs'], ['html']);
-  gulp.watch(['./site/**/*.html'], ['html']);
-  gulp.watch(['./web/{scss,css,js}/*.{scss,css,js}']).on('change', reload);
-  gulp.watch(['./web/*.html']).on('change', reload);
+  gulp.watch(['./site/**/*.html'], ['html']).on('change', browserSync.reload);
+  gulp.watch(['./site/**/*.json'], ['html']).on('change', browserSync.reload);
+  gulp.watch(['./src/data/**/*.json'], ['html']);
+  gulp.watch(['./web/{scss,css,js}/*.{scss,css,js}']).on('change', browserSync.reload);
+  gulp.watch(['./web/*.html']).on('change', browserSync.reload);
 });
+
+
+// ----------------------------------------------------- Default
+gulp.task( 'default', [ 'sass','scripts', 'browser-sync' ] );
 
 // ----------------------------------------------------------------
 

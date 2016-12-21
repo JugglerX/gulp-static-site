@@ -1,0 +1,32 @@
+.header {
+	display: block;
+	height: 60px;
+	padding: 10px 0 10px 0;
+}      
+.menu {
+	float: left;
+	ul {
+		padding: 0;
+		margin: 0;
+		li {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+			float: left;
+			margin-right: 10px;
+		}
+	}
+}
+.logo {
+	float: left;
+	font-family: $custom-font;
+}
+
+.account {
+	float: right;
+}
+
+.themebar {
+	height: 40px;
+	background: black;
+}

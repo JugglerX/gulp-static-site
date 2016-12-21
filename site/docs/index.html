@@ -1,0 +1,76 @@
+---
+title: Front Matter Title
+description: blog page using front matter
+layout: home
+base_url: "./"
+--- 
+
+<!DOCTYPE HTML>
+<html>
+<head> 
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/scripts.js"></script>
+</head>
+ 
+<body>
+
+{{> include/header}}
+    
+{{{block "content"}}}
+
+<h2>Template Variables</h2>
+<span><strong>\{{contactinfo}}</strong> - <code class="language-html">src/data/contactinfo.json </code>
+<p>This template variable uses data from src/data/contactinfo.json -  The variable is based on the filename.</p>
+<pre><code class="language-json">{{json contactinfo}}</code></pre>
+
+<strong>\{{contactinfo.name}}</strong> - <code class="language-html">src/data/contactinfo.json </code>
+<p>To access a property inside of contactinfo use dot notation.</p>
+<pre><code class="language-json">{{json contactinfo.name}}</code></pre>
+
+<strong>\{{menu}}</strong> - <code class="language-html">src/data/menu.json </code>
+<p>You can access any template variable in the /src/data directory from every page</p>
+<pre><code class="language-json">{{json menu}}</code></pre>
+
+<strong>{json site}</strong> 
+<pre><code class="language-json">{{json site}}</code></pre>
+
+<strong>{json @file.data}}</strong>
+<pre><code class="language-json">{{json @file.data}}</code></pre>
+
+<strong>{json @file}}</strong>
+<pre><code class="language-json">{{json @file}}</code></pre>
+
+<strong>{json @file.meta}}</strong>
+<pre><code class="language-json">{{json @file.meta}}</code></pre>
+
+
+<strong>{json file.data}}</strong>
+<pre><code class="language-json">{{json file.data}}</code></pre>
+
+<strong>{json data}}</strong>
+<pre><code class="language-json">{{json data}}</code></pre>
+
+<strong>{json file.name}}</strong>
+<pre><code class="language-json">{{json file.name}}</code></pre>
+
+<strong>{file.data.name}}</strong>
+<pre><code class="language-json">{{file.data.name}}</code></pre>
+
+<strong>{json file.data}}</strong>
+<pre><code class="language-json">{{json file.data}}</code></pre>
+
+<strong>{json lorem}}</strong>
+<pre><code class="language-json">{{json lorem}}</code></pre>
+
+<a href="blog/testing.html">Testing</a>
+{{> include/footer}}
+</body>
+</html>
+
+
